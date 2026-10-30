@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T00:00:00+03:00",
+  "title": "Умра с Ильфатом — фактическая дизайн-система прототипа",
+  "extensions": {
+    "colorMeta": {
+      "dark": { "role": "neutral", "displayName": "Графитовый фон", "canonical": "#202622" },
+      "gold": { "role": "primary", "displayName": "Тёплое золото", "canonical": "#d6bc80" },
+      "paper": { "role": "neutral", "displayName": "Светлая бумага", "canonical": "#f7f5ee" },
+      "ink": { "role": "neutral", "displayName": "Основной текст", "canonical": "#262d27" },
+      "muted": { "role": "neutral", "displayName": "Вторичный текст", "canonical": "#62695f" },
+      "line": { "role": "neutral", "displayName": "Разделитель", "canonical": "#dddcd2" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Georgia", "purpose": "Заголовки: Georgia, Times New Roman, serif; вес 400; базовая высота строки 1.12." },
+      "body": { "displayName": "Segoe UI", "purpose": "Основной текст: Segoe UI, Arial, sans-serif; 16px/1.65. На мобильных большинство абзацев 14px." }
+    },
+    "shadows": [ { "name": "mobile-call", "value": "0 5px 25px #10171040", "purpose": "Закреплённая мобильная кнопка звонка." } ],
+    "motion": [
+      { "name": "button", "value": "background .2s, color .2s", "purpose": "Наведение на кнопку; отключается при prefers-reduced-motion." },
+      { "name": "gallery", "value": "transform .5s", "purpose": "Фото увеличивается до scale(1.035) при наведении; отключается при prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "wide-min", "value": "1600px" },
+      { "name": "compact-max", "value": "1150px" },
+      { "name": "tablet-max", "value": "900px" },
+      { "name": "mobile-max", "value": "600px" },
+      { "name": "narrow-max", "value": "380px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Основная кнопка",
+      "kind": "button",
+      "description": "Звонок организатору. Минимальная высота 54px, радиус 4px.",
+      "html": "<a class=\"ds-gold\" href=\"tel:+79638912107\">Позвонить Ильфату</a>",
+      "css": ".ds-gold{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:14px 25px;background:var(--gold,#d6bc80);color:var(--dark,#202622);font:600 14px 'Segoe UI',Arial,sans-serif;border:1px solid transparent;border-radius:4px;text-decoration:none;transition:background .2s,color .2s}.ds-gold:hover{background:#e6cf9e}.ds-gold:focus-visible{outline:3px solid #9d792e;outline-offset:6px}@media(prefers-reduced-motion:reduce){.ds-gold{transition:none}}"
+    },
+    {
+      "name": "Тёмная кнопка",
+      "kind": "button",
+      "description": "Действие в светлом блоке поездки.",
+      "html": "<a class=\"ds-dark\" href=\"tel:+79638912107\">Узнать подробности ↗</a>",
+      "css": ".ds-dark{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:14px 25px;background:var(--dark,#202622);color:var(--paper,#f7f5ee);font:600 14px 'Segoe UI',Arial,sans-serif;border:1px solid transparent;border-radius:4px;text-decoration:none;transition:background .2s,color .2s}.ds-dark:hover{background:#374439}.ds-dark:focus-visible{outline:3px solid #9d792e;outline-offset:6px}@media(prefers-reduced-motion:reduce){.ds-dark{transition:none}}"
+    },
+    {
+      "name": "Меню",
+      "kind": "nav",
+      "description": "Текстовая навигация. До 900px раскрывается кнопкой.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#trip\">Ближайшая умра</a><a href=\"#ilfat\">Об Ильфате</a></nav>",
+      "css": ".ds-nav{display:flex;gap:25px;background:var(--dark,#202622);color:#f5f3ea;padding:15px;font:13px 'Segoe UI',Arial,sans-serif}.ds-nav a{color:inherit;text-decoration:none;padding-block:15px}.ds-nav a:hover{color:var(--gold,#d6bc80)}.ds-nav a:focus-visible{outline:3px solid #9d792e;outline-offset:6px}"
+    },
+    {
+      "name": "Метка групповой поездки",
+      "kind": "chip",
+      "description": "Неинтерактивная метка формата поездки.",
+      "html": "<span class=\"ds-trip-tag\">Групповая поездка</span>",
+      "css": ".ds-trip-tag{display:inline-block;font:11px 'Segoe UI',Arial,sans-serif;border:1px solid #d8d7cd;padding:5px 10px;border-radius:20px;color:var(--muted,#62695f);background:#fff;white-space:nowrap}"
+    },
+    {
+      "name": "Условия поездки",
+      "kind": "card",
+      "description": "Светлая плоская панель с тонкой рамкой; заголовок Georgia.",
+      "html": "<section class=\"ds-trip-card\"><h3>Умра из Уфы</h3><p>10 ноября 2026 · 1 690 $</p></section>",
+      "css": ".ds-trip-card{padding:35px 40px;background:#fff;border:1px solid var(--line,#dddcd2);color:var(--ink,#262d27)}.ds-trip-card h3{font:400 32px Georgia,serif;margin:0}.ds-trip-card p{font:15px/1.65 'Segoe UI',Arial,sans-serif;margin:20px 0 0}@media(max-width:600px){.ds-trip-card{padding:24px 20px}.ds-trip-card h3{font-size:26px}}"
+    }
+  ],
+  "narrative": {
+    "overview": "Графитовый и тёплый золотой взяты из согласованного референса. Реальные фотографии — основное доказательство поездок. Светлые разделы делают условия читаемыми.",
+    "keyCharacteristics": [],
+    "rules": [],
+    "dos": [],
+    "donts": []
+  }
+}
