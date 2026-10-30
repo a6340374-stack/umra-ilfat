@@ -28,18 +28,65 @@ const shareText = 'Умра из Уфы с Ильфатом хазратом Ю�
 const shareButton = document.querySelector('#share-poster');
 const shareOptions = document.querySelector('#share-options');
 const shareStatus = document.querySelector('#share-status');
-let posterFile;
+const countElement = document.querySelector('#share-count');
+const counterApi = 'https://countapi.mileshilliard.com/api/v1';
+const counterKey = 'umra-ilfat-poster-2026-11-28-a6340374';
+const sharedStorageKey = 'umra-ilfat-shared-2026-11-28';
+let countedThisBrowser = false;
+let countPending = false;
+let countRevision = 0;
+try { countedThisBrowser = localStorage.getItem(sharedStorageKey) === '1'; } catch { /* Storage may be blocked. */ }
+
+async function requestCounter(action) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 6000);
+  try {
+    const response = await fetch(`${counterApi}/${action}/${counterKey}`, {
+      cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer', signal: controller.signal
+    });
+    if (!response.ok) throw new Error('Counter unavailable');
+    const data = await response.json();
+    if (!Number.isSafeInteger(data.value) || data.value < 0) throw new Error('Invalid counter');
+    return data.value;
+  } finally { clearTimeout(timeout); }
+}
+
+function showCount(value) {
+  countElement.textContent = value.toLocaleString('ru-RU');
+  countElement.removeAttribute('title');
+}
+
+const initialCountRevision = countRevision;
+requestCounter('get').then(value => {
+  if (countRevision === initialCountRevision) showCount(value);
+}).catch(() => {
+  if (countRevision === initialCountRevision) {
+    countElement.textContent = '—';
+    countElement.title = 'Счётчик временно недоступен';
+  }
+});
+
+async function recordShareAction() {
+  if (countedThisBrowser || countPending) return;
+  countPending = true;
+  countRevision++;
+  try {
+    showCount(await requestCounter('hit'));
+    countedThisBrowser = true;
+    try { localStorage.setItem(sharedStorageKey, '1'); } catch { /* Deduplicate in memory for this visit. */ }
+  } catch {
+    countElement.textContent = '—';
+    countElement.title = 'Счётчик временно недоступен';
+  } finally { countPending = false; }
+}
 
 document.querySelector('#share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
 document.querySelector('#share-whatsapp').href = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
 
-// Load the image before the click so the native share keeps its user activation.
-if (typeof navigator.share === 'function' && typeof navigator.canShare === 'function') {
-  fetch('assets/umra-november-poster.jpg')
-    .then(response => { if (!response.ok) throw new Error('Poster unavailable'); return response.blob(); })
-    .then(blob => { posterFile = new File([blob], 'umra-ilfat-28-november.jpg', { type: 'image/jpeg' }); })
-    .catch(() => { posterFile = undefined; });
-}
+// Social links prepare the message; they do not confirm that it was delivered.
+['#share-telegram', '#share-whatsapp'].forEach(selector => {
+  document.querySelector(selector).addEventListener('click', () => { void recordShareAction(); });
+});
 
 shareButton.addEventListener('click', async () => {
   shareStatus.textContent = '';
@@ -50,10 +97,10 @@ shareButton.addEventListener('click', async () => {
   }
   shareButton.disabled = true;
   try {
-    const data = posterFile && navigator.canShare?.({ files: [posterFile] })
-      ? { files: [posterFile], title: shareTitle, text: shareText }
-      : { title: shareTitle, text: shareText, url: shareUrl };
-    await navigator.share(data);
+    // Share the website URL so the message retains a clickable site link.
+    // The page's Open Graph image supplies the poster preview in supporting apps.
+    await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+    void recordShareAction();
   } catch (error) {
     if (error.name !== 'AbortError') {
       shareOptions.open = true;
@@ -67,6 +114,7 @@ shareButton.addEventListener('click', async () => {
 document.querySelector('#copy-poster-link').addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(shareUrl);
+    void recordShareAction();
     shareStatus.textContent = 'Ссылка скопирована. Вставьте её в сообщение или публикацию.';
   } catch {
     document.querySelector('#manual-share').hidden = false;
@@ -76,3 +124,5 @@ document.querySelector('#copy-poster-link').addEventListener('click', async () =
     shareStatus.textContent = 'Выделите и скопируйте ссылку из поля.';
   }
 });
+
+document.querySelector('#poster-share-url').addEventListener('copy', () => { void recordShareAction(); });
