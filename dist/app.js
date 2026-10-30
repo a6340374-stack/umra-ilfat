@@ -22,11 +22,11 @@ document.querySelectorAll('[data-photo]').forEach(button => button.addEventListe
 document.querySelector('.close-photo').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) { const box = dialog.getBoundingClientRect(); if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) dialog.close(); } });
 
-const shareUrl = 'https://a6340374-stack.github.io/umra-ilfat/#poster';
+const shareUrl = 'https://a6340374-stack.github.io/umra-ilfat/?v=ilfat-photo#poster';
 const shareTitle = 'Умра с Ильфатом · 28 ноября — 11 декабря 2026';
 const shareText = 'Умра из Уфы с Ильфатом хазратом Юнусбаевым. 28 ноября — 11 декабря 2026. Стоимость 1 690 $. Телефон: +7 (963) 891-21-07.';
 const shareButton = document.querySelector('#share-poster');
-const shareOptions = document.querySelector('#share-options');
+const copyLinkButton = document.querySelector('#copy-poster-link');
 const shareStatus = document.querySelector('#share-status');
 const countElement = document.querySelector('#share-count');
 const counterApi = 'https://countapi.mileshilliard.com/api/v1';
@@ -80,31 +80,23 @@ async function recordShareAction() {
   } finally { countPending = false; }
 }
 
-document.querySelector('#share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-document.querySelector('#share-whatsapp').href = `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`;
-
-// Social links prepare the message; they do not confirm that it was delivered.
-['#share-telegram', '#share-whatsapp'].forEach(selector => {
-  document.querySelector(selector).addEventListener('click', () => { void recordShareAction(); });
-});
-
 shareButton.addEventListener('click', async () => {
   shareStatus.textContent = '';
   if (typeof navigator.share !== 'function') {
-    shareOptions.open = true;
-    shareStatus.textContent = 'Выберите приложение или скопируйте ссылку.';
+    copyLinkButton.focus();
+    shareStatus.textContent = 'Нажмите «Скопировать ссылку» и вставьте её в сообщение.';
     return;
   }
   shareButton.disabled = true;
   try {
     // Share the website URL so the message retains a clickable site link.
-    // The page's Open Graph image supplies the poster preview in supporting apps.
+    // The page's Open Graph image supplies Ilfat's portrait in supporting apps.
     await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
     void recordShareAction();
   } catch (error) {
     if (error.name !== 'AbortError') {
-      shareOptions.open = true;
-      shareStatus.textContent = 'Меню отправки недоступно. Выберите другой способ ниже.';
+      copyLinkButton.focus();
+      shareStatus.textContent = 'Меню отправки недоступно. Нажмите «Скопировать ссылку».';
     }
   } finally {
     shareButton.disabled = false;
